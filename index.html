@@ -145,12 +145,31 @@ const core = {
     },
 
     readLoop: async () => {
+        let buffer = new Uint8Array();
         while (core.isRunning) {
             const { value, done } = await core.reader.read();
             if (done) break;
-            const hex = Array.from(value).map(b => b.toString(16).toUpperCase().padStart(2, '0')).join(' ');
-            core.log("RX: " + hex);
-            if (value[0] === 0x62) core.parse(value.slice(3));
+            
+            // Stitch fragments together
+            let newBuf = new Uint8Array(buffer.length + value.length);
+            newBuf.set(buffer);
+            newBuf.set(value, buffer.length);
+            buffer = newBuf;
+
+            // Process full UDS response (usually 6-8 bytes for these PIDs)
+            if (buffer.length >= 6) {
+                const hex = Array.from(buffer).map(b => b.toString(16).toUpperCase().padStart(2, '0')).join(' ');
+                core.log("RX: " + hex);
+                
+                // Find the 0x62 response marker
+                const startIdx = buffer.indexOf(0x62);
+                if (startIdx !== -1 && buffer.length >= startIdx + 3) {
+                    core.parse(buffer.slice(startIdx + 3));
+                    buffer = new Uint8Array(); // Clear after successful parse
+                } else if (buffer.length > 12) {
+                    buffer = new Uint8Array(); // Flush if buffer gets stuck with junk
+                }
+            }
         }
     },
 
@@ -159,17 +178,10 @@ const core = {
             for (let s of core.map[core.activeSensors]) {
                 if (!core.isRunning) break;
                 await core.sendUDS([0x22, ...s.d]);
-                await new Promise(r => setTimeout(r, 160)); // 160ms cycle
+                // Increased delay to 220ms to stop the "3F" collisions
+                await new Promise(r => setTimeout(r, 220)); 
             }
         }
-    },
-
-    parse: (data) => {
-        core.map[core.activeSensors].forEach((s, i) => {
-            const val = s.p(data);
-            document.getElementById(`v${i+1}`).innerText = val + s.u;
-            core.draw(i + 1, val, s.m);
-        });
     },
 
     draw: (idx, v, m) => {
