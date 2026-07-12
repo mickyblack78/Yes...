@@ -1,7 +1,6 @@
 // Unique cache name - change this version number (e.g., v1.1) when you update your app
 const CACHE_NAME = 'townsville-radar-v1.0';
 const ASSETS_TO_CACHE = [
-  './',
   './index.html',
   './style.css',
   './app.js'
