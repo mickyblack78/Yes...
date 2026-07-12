@@ -118,3 +118,63 @@
         .subtitle { text-align: center; color: #8a99ad; font-size: 12px; margin-bottom: 20px; }
         .btn-stack { display: flex; flex-direction: column; gap: 12px; }
         
+               <div class="app-card" id="main-panel">
+            <h1>📍 MASTER DEAL HUB</h1>
+            <div class="subtitle">Hyper-Local Townsville Price Radar & Dashboard</div>
+
+            <!-- EMERGENCY RADAR SLOT (Pings phone lock-screen on extreme drop) -->
+            <div class="radar-panel">
+                <div class="radar-title">🚨 EMERGENCY PRICE RADAR</div>
+                <div id="emergency-alert-zone" class="alert-stream">
+                    No extreme deals active right now. Phone is silent.
+                </div>
+            </div>
+
+            <!-- DAILY ESSENTIALS DISPLAY (Always shows the current best option) -->
+            <div class="essential-box">
+                <div style="font-size: 12px; font-weight: 700; color: #8a99ad; margin-bottom: 6px;">⛽ CHEAPEST FUEL TOWNSVILLE REGION</div>
+                <div id="cheapest-fuel-price" style="font-size: 16px; font-weight: 800; color: #fff;">Loading live Queensland API data...</div>
+            </div>
+            
+            <!-- MASTER FUNCTIONAL BUTTON STACK -->
+            <div class="btn-stack">
+                <div class="action-trigger" onclick="viewStoreData('bunnings')">
+                    <div class="icon-box">🔨</div>
+                    <div class="txt-box">
+                        <span class="txt-main">Bunnings Warehouse</span>
+                        <span id="bunnings-best" class="txt-sub">Loading daily Garbutt clearance item...</span>
+                    </div>
+                </div>
+
+                <div class="action-trigger" onclick="viewStoreData('kmart')">
+                    <div class="icon-box">🛒</div>
+                    <div class="txt-box">
+                        <span class="txt-main">Kmart Stockland</span>
+                        <span id="kmart-best" class="txt-sub">Loading localized stock clearances...</span>
+                    </div>
+                </div>
+
+                <div class="action-trigger" onclick="viewStoreData('automotive')">
+                    <div class="icon-box">🛞</div>
+                    <div class="txt-box">
+                        <span class="txt-main">Supercheap Auto & Tyrepro</span>
+                        <span id="auto-best" class="txt-sub">Loading local battery, oil & tyre deals...</span>
+                    </div>
+                </div>
+
+                <div class="action-trigger" onclick="viewStoreData('pubs')">
+                    <div class="icon-box">🥩</div>
+                    <div class="txt-box">
+                        <span class="txt-main">Cactus Jack's & Local Pubs</span>
+                        <span id="pub-best" class="txt-sub">Loading tonight's local cheap meal special...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN LOGIC CONNECTOR -->
+    <script src="app.js"></script>
+</body>
+</html>
+        
