@@ -1,244 +1,180 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-AU">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GW4D20 MASTER MONITOR</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Deal Hub</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0d0e15">
     <style>
-        :root { --bg: #010101; --accent: #00f2ff; --danger: #f00; --panel: #111; }
-        body { background: var(--bg); color: #fff; font-family: monospace; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        header { padding: 10px; background: #000; border-bottom: 2px solid #333; display: flex; justify-content: space-between; font-size: 13px; }
-        
-        /* Fixed Gauge Layout to stop "Box Review" */
-        #gauge-grid { flex: 0 0 40%; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; }
-        .gauge-card { 
-            background: var(--panel); 
-            border: 2px solid #222; 
-            border-radius: 50%; /* Force Circularity */
-            aspect-ratio: 1 / 1;
-            position: relative; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center;
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #ff0055;
+            --bg-dark: #0a0b10;
         }
-        canvas { width: 90%; height: 90%; }
-        .v-val { position: absolute; top: 45%; font-size: 24px; font-weight: bold; color: var(--accent); transform: translateY(-50%); }
-        .v-label { position: absolute; bottom: 15%; font-size: 10px; color: #888; }
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-dark); overflow: hidden; color: #fff;
+        }
+        
+        /* THE MAIN APP CANVAS (Dynamically shifts based on button selection) */
+        #app-canvas {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            background: radial-gradient(circle at 50% 50%, #141724 0%, #050609 100%);
+        }
 
-        #console { flex: 1; background: #000; margin: 5px 10px; border: 1px solid #333; padding: 10px; font-size: 11px; overflow-y: auto; color: #0f0; border-left: 4px solid var(--accent); }
+        /* 1. STATE DEFAULT: ABSTRACT FUTURISTIC CYBERPUNK DNA CANVAS */
+        .bg-dna {
+            background-image: 
+                radial-gradient(var(--neon-cyan) 1px, transparent 0), 
+                radial-gradient(var(--neon-magenta) 1px, transparent 0);
+            background-size: 40px 40px; background-position: 0 0, 20px 20px;
+            opacity: 0.15; animation: dnaHelix 20s linear infinite;
+        }
+        @keyframes dnaHelix {
+            0% { background-position: 0 0, 20px 20px; transform: scale(1); }
+            50% { transform: scale(1.1) rotate(2deg); }
+            100% { background-position: 40px 80px, 60px 100px; transform: scale(1); }
+        }
+
+        /* 2. STATE FOOD: CONVEYOR MATRIX / NEON PACKAGING STREAM */
+        .bg-food {
+            background: linear-gradient(90deg, rgba(255,0,85,0.05) 1px, transparent 1px), linear-gradient(0deg, rgba(255,0,85,0.05) 1px, transparent 1px);
+            background-size: 20px 20px; animation: conveyor 4s linear infinite;
+        }
+        @keyframes conveyor { 0% { background-position: 0 0; } 100% { background-position: 0 40px; } }
+
+        /* 3. STATE TECH: FLOATING BINARY DIGITAL CIRCUITS */
+        .bg-tech {
+            background: radial-gradient(rgba(0, 243, 255, 0.1) 15%, transparent 20%), radial-gradient(rgba(0, 243, 255, 0.05) 15%, transparent 20%);
+            background-size: 60px 60px; background-position: 0 0, 30px 30px; animation: circuits 8s ease infinite;
+        }
+        @keyframes circuits { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.7; } }
+
+        /* 4. STATE TRAVEL: AIRPORT VECTOR HUD RADAR TARGETS */
+        .bg-travel {
+            background: repeating-radial-gradient(circle, rgba(0,243,255,0.02), rgba(0,243,255,0.02) 20px, transparent 20px, transparent 40px);
+            animation: radarSweep 10s linear infinite;
+        }
+        @keyframes radarSweep { 0% { transform: scale(0.9); } 100% { transform: scale(1.2); } }
+
+        /* 5. STATE VEHICLES: THE CYBER COCKPIT (HUD Dashboard, Shifter, Windscreen) */
+        .bg-vehicles {
+            background: 
+                linear-gradient(180deg, rgba(10,11,16,0.9) 0%, rgba(20,23,36,0.4) 50%, rgba(5,6,9,0.95) 80%),
+                repeating-linear-gradient(0deg, rgba(0,243,255,0.03) 0px, rgba(0,243,255,0.03) 2px, transparent 2px, transparent 4px);
+        }
+        /* Steering Wheel & Gear Shifter Vector Overlays */
+        .hud-wheel {
+            position: absolute; bottom: -100px; left: calc(50% - 150px); width: 300px; height: 300px;
+            border: 12px solid rgba(0, 243, 255, 0.15); border-radius: 50%; opacity: 0;
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.1); transform: rotate(0deg); transition: opacity 0.5s;
+        }
+        .hud-shifter {
+            position: absolute; bottom: 20px; right: 40px; width: 14px; height: 120px;
+            background: linear-gradient(to top, rgba(255,0,85,0.4), var(--neon-magenta));
+            border-radius: 10px; opacity: 0; transition: opacity 0.5s; transform-origin: bottom center;
+        }
+        .bg-vehicles .hud-wheel { opacity: 1; animation: steerDrive 6s ease-in-out infinite; }
+        .bg-vehicles .hud-shifter { opacity: 1; animation: shiftGear 4s ease-in-out infinite; }
+        @keyframes steerDrive { 0%, 100% { transform: rotate(0deg); } 30% { transform: rotate(15deg); } 70% { transform: rotate(-12deg); } }
+        @keyframes shiftGear { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-10deg); } }
+
+        /* 6. STATE WILDCARD: GLITCH MATRIX WALL */
+        .bg-wildcard {
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 6px 100%; animation: staticNoise 0.2s infinite;
+        }
+        @keyframes staticNoise { 0% { background-position: 0 0; } 100% { background-position: 5px 5px; } }
+
+        /* FOREGROUND UI CONTAINER */
+        .ui-wrapper {
+            position: relative; z-index: 10; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            box-sizing: border-box; padding: 20px;
+        }
+        .app-card {
+            width: 100%; max-width: 440px; background: rgba(13, 15, 24, 0.75);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px;
+            padding: 30px 24px; box-sizing: border-box;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        h1 { margin: 0 0 5px 0; text-align: center; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: #fff; }
+        .subtitle { text-align: center; color: #8a99ad; font-size: 13px; margin-bottom: 30px; }
         
-        /* 70px Bottom Buffer for Android Navigation */
-        #controls-container { padding: 5px 10px 70px 10px; background: #080808; border-top: 1px solid #222; }
-        .controls-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-        
-        button { padding: 14px 2px; border: 1px solid #444; border-radius: 4px; font-size: 10px; font-weight: bold; color: #fff; background: #222; }
-        button:active { background: var(--accent); color: #000; }
-        .btn-blue { border-color: var(--accent); color: var(--accent); }
-        .btn-red { border-color: var(--danger); color: var(--danger); }
-        .hidden { display: none !important; }
+        /* MASTER STREAMLINED BUTTONS */
+        .btn-stack { display: flex; flex-direction: column; gap: 14px; }
+        .action-trigger {
+            display: flex; align-items: center; background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px;
+            padding: 16px; text-decoration: none; color: #fff; transition: all 0.3s ease;
+            cursor: pointer; position: relative; overflow: hidden;
+        }
+        .action-trigger:hover, .action-trigger.active {
+            background: rgba(0, 243, 255, 0.08); border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.15); transform: translateY(-2px);
+        }
+        .icon-box { font-size: 28px; margin-right: 15px; width: 45px; text-align: center; }
+        .txt-box { display: flex; flex-direction: column; }
+        .txt-main { font-weight: 700; font-size: 15px; letter-spacing: 0.2px; }
+        .txt-sub { font-size: 12px; color: #8a99ad; margin-top: 3px; font-weight: 400; }
+
+        /* WINDOW CONTROLS (Back / Reset Overlay) */
+        #window-exit {
+            position: absolute; top: 20px; left: 20px; background: rgba(255,0,85,0.2);
+            border: 1px solid var(--neon-magenta); color: #fff; padding: 10px 18px;
+            border-radius: 30px; font-size: 12px; font-weight: 700; cursor: pointer;
+            opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 100;
+        }
+        #window-exit.visible { opacity: 1; pointer-events: auto; }
     </style>
 </head>
 <body>
 
-<header>
-    <div id="status">● STANDBY</div>
-    <div id="pg-name">SENSORS [P1]</div>
-</header>
-
-<div id="gauge-grid">
-    <div class="gauge-card"><canvas id="g1"></canvas><div class="v-val" id="v1">0</div><div class="v-label" id="l1">RPM</div></div>
-    <div class="gauge-card"><canvas id="g2"></canvas><div class="v-val" id="v2">0</div><div class="v-label" id="l2">TEMP</div></div>
-    <div class="gauge-card"><canvas id="g3"></canvas><div class="v-val" id="v3">0</div><div class="v-label" id="l3">BOOST</div></div>
-    <div class="gauge-card"><canvas id="g4"></canvas><div class="v-val" id="v4">0</div><div class="v-label" id="l4">SPEED</div></div>
-</div>
-
-<div id="console">SHELL LOADED. LOGIC READY.</div>
-
-<div id="controls-container">
-    <div id="ctrl-p1" class="controls-grid">
-        <button class="btn-blue" onclick="core.connect()">CONNECT ALL</button>
-        <button onclick="core.nextSensors()">NEXT SENSORS</button>
-        <button id="pause-btn" class="btn-red" onclick="core.toggleLive()">STOP LIVE</button>
-        
-        <button onclick="core.sendUDS([0x19, 0x02, 0x08])">READ FAULTS</button>
-        <button onclick="core.sendUDS([0x14, 0xFF, 0xFF, 0xFF])">CLEAR FAULTS</button>
-        <button style="color:#ffd700; border-color:#ffd700;" onclick="core.exportLog()">EXPORT LOG</button>
-        
-        <button class="btn-red" onclick="core.disconnect()">DISCONNECT</button>
-        <button style="visibility:hidden"></button>
-        <button class="btn-blue" onclick="core.toggleCtrl(2)">NEXT TOOLS &gt;</button>
+    <!-- THE DYNAMIC VECTOR CANVAS ENVIRONMENT -->
+    <div id="app-canvas" class="bg-dna">
+        <div class="hud-wheel"></div>
+        <div class="hud-shifter"></div>
     </div>
 
-    <div id="ctrl-p2" class="controls-grid hidden">
-        <button onclick="document.getElementById('console').innerHTML=''">CLS SCREEN</button>
-        <button onclick="core.manualHex()">CUSTOM HEX</button>
-        <button onclick="core.sendUDS([0x11, 0x01])">ECU RESET</button>
-        
-        <button onclick="location.reload()">RELOAD APP</button>
-        <button style="visibility:hidden"></button>
-        <button style="visibility:hidden"></button>
-        
-        <button style="visibility:hidden"></button>
-        <button style="visibility:hidden"></button>
-        <button class="btn-blue" onclick="core.toggleCtrl(1)">&lt; BACK MAIN</button>
-    </div>
-</div>
-  <script>
-const core = {
-    port: null, writer: null, reader: null, isRunning: false, isLive: true,
-    activeSensors: 1, logStr: "",
-    
-    // 90% Logic Depth: Formula Table
-    map: {
-        1: [
-            { n: "RPM", d: [0xF4, 0x0C], u: "", m: 6000, p: b => Math.round(((b[0]*256)+b[1])/4) },
-            { n: "TEMP", d: [0xF4, 0x05], u: "°C", m: 120, p: b => b[0]-40 },
-            { n: "BOOST", d: [0xF4, 0x0B], u: " Bar", m: 2.5, p: b => (((b[0]*256)+b[1])/100).toFixed(2) },
-            { n: "SPEED", d: [0xF4, 0x0D], u: " kmh", m: 220, p: b => b[0] }
-        ],
-        2: [
-            { n: "BATTERY", d: [0xF4, 0x42], u: "V", m: 16, p: b => (((b[0]*256)+b[1])/1000).toFixed(1) },
-            { n: "LOAD", d: [0xF4, 0x04], u: "%", m: 100, p: b => Math.round(b[0]*100/255) },
-            { n: "IAT", d: [0xF4, 0x0F], u: "°C", m: 100, p: b => b[0]-40 },
-            { n: "FUEL", d: [0xF4, 0x23], u: " kPa", m: 180000, p: b => ((b[0]*256)+b[1])*10 }
-        ]
-    },
+    <!-- UI LAYER COCKPIT INTERFACE -->
+    <div class="ui-wrapper">
+        <button id="window-exit" onclick="resetDashboard()">❌ Exit Viewport</button>
 
-    log: (msg, force = false) => {
-        const c = document.getElementById('console');
-        const entry = `[${new Date().toLocaleTimeString().split(' ')[0]}] ${msg}`;
-        core.logStr += entry + "\n"; // Always log for Export Log
-        if (core.isLive || force) {
-            const d = document.createElement('div');
-            d.textContent = entry;
-            c.appendChild(d);
-            c.scrollTop = c.scrollHeight;
-            if (c.childElementCount > 200) c.removeChild(c.firstChild);
-        }
-    },
-
-    connect: async () => {
-        try {
-            core.port = await navigator.serial.requestPort();
-            await core.port.open({ baudRate: 115200 });
-            core.writer = core.port.writable.getWriter();
-            core.reader = core.port.readable.getReader();
-            document.getElementById('status').innerText = "● ONLINE";
-            document.getElementById('status').style.color = core.accent;
-            core.log("PORT OPEN. STARTING HANDSHAKE...", true);
+        <div class="app-card" id="main-panel">
+            <h1>📍 MASTER DEAL HUB</h1>
+            <div class="subtitle">Tap category to morph canvas & scrape live Australian pages</div>
             
-            // HANDSHAKE: Extended Session + Security
-            await core.sendUDS([0x10, 0x03]);
-            await new Promise(r => setTimeout(r, 200));
-            await core.sendUDS([0x27, 0x01]);
-            
-            core.isRunning = true;
-            core.readLoop(); core.pollLoop();
-        } catch (e) { core.log("ERR: " + e.message, true); }
-    },
+            <div class="btn-stack">
+                <a href="https://ozbargain.com.au" target="_blank" class="action-trigger" onmouseenter="morphCanvas('food')" onmouseleave="clearMorph()">
+                    <span class="icon-box">🍔</span>
+                    <div class="txt-box">
+                        <span class="txt-main">Food & Takeaways</span>
+                        <span class="txt-sub">Macca's, KFC $1 Drops, Domino's, Independent Butchers</span>
+                    </div>
+                </a>
 
-    sendUDS: async (bytes) => {
-        if (!core.writer) return;
-        await core.writer.write(new Uint8Array(bytes));
-        core.log("TX: " + Array.from(bytes).map(b => b.toString(16).toUpperCase().padStart(2, '0')).join(' '));
-    },
+                <a href="https://ozbargain.com.au" target="_blank" class="action-trigger" onmouseenter="morphCanvas('tech')" onmouseleave="clearMorph()">
+                    <span class="icon-box">💻</span>
+                    <div class="txt-box">
+                        <span class="txt-main">Electronics & Tech</span>
+                        <span class="txt-sub">Amazon Glitches, eBay Vouchers, JB Hi-Fi Commercial Matches</span>
+                    </div>
+                </a>
 
-    readLoop: async () => {
-        let buffer = new Uint8Array();
-        while (core.isRunning) {
-            const { value, done } = await core.reader.read();
-            if (done) break;
-            
-            // Stitch fragments together
-            let newBuf = new Uint8Array(buffer.length + value.length);
-            newBuf.set(buffer);
-            newBuf.set(value, buffer.length);
-            buffer = newBuf;
+                <a href="https://ozbargain.com.au" target="_blank" class="action-trigger" onmouseenter="morphCanvas('travel')" onmouseleave="clearMorph()">
+                    <span class="icon-box">✈️</span>
+                    <div class="txt-box">
+                        <span class="txt-main">Holidays & Travel</span>
+                        <span class="txt-sub">Jetstar Flight Drops, Secret Hotel Promos, Free Luggage Loops</span>
+                    </div>
+                </a>
 
-            // Process full UDS response (usually 6-8 bytes for these PIDs)
-            if (buffer.length >= 6) {
-                const hex = Array.from(buffer).map(b => b.toString(16).toUpperCase().padStart(2, '0')).join(' ');
-                core.log("RX: " + hex);
-                
-                // Find the 0x62 response marker
-                const startIdx = buffer.indexOf(0x62);
-                if (startIdx !== -1 && buffer.length >= startIdx + 3) {
-                    core.parse(buffer.slice(startIdx + 3));
-                    buffer = new Uint8Array(); // Clear after successful parse
-                } else if (buffer.length > 12) {
-                    buffer = new Uint8Array(); // Flush if buffer gets stuck with junk
-                }
-            }
-        }
-    },
-
-    pollLoop: async () => {
-        while (core.isRunning) {
-            for (let s of core.map[core.activeSensors]) {
-                if (!core.isRunning) break;
-                await core.sendUDS([0x22, ...s.d]);
-                // Increased delay to 220ms to stop the "3F" collisions
-                await new Promise(r => setTimeout(r, 220)); 
-            }
-        }
-    },
-
-    draw: (idx, v, m) => {
-        const c = document.getElementById(`g${idx}`);
-        const ctx = c.getContext('2d');
-        const centerX = 100, centerY = 100, radius = 80;
-        ctx.clearRect(0,0,200,200);
-        // Background track
-        ctx.beginPath(); ctx.arc(centerX, centerY, radius, 0.8 * Math.PI, 2.2 * Math.PI);
-        ctx.strokeStyle = "#222"; ctx.lineWidth = 15; ctx.stroke();
-        // Active value
-        ctx.beginPath();
-        const end = 0.8 * Math.PI + (Math.min(v, m) / m) * (1.4 * Math.PI);
-        ctx.arc(centerX, centerY, radius, 0.8 * Math.PI, end);
-        ctx.strokeStyle = "#00f2ff"; ctx.lineWidth = 15; ctx.stroke();
-    },
-
-    nextSensors: () => {
-        core.activeSensors = core.activeSensors === 2 ? 1 : 2;
-        document.getElementById('pg-name').innerText = `SENSORS [P${core.activeSensors}]`;
-        core.map[core.activeSensors].forEach((s, i) => document.getElementById(`l${i+1}`).innerText = s.n);
-    },
-
-    toggleLive: () => {
-        core.isLive = !core.isLive;
-        const btn = document.getElementById('pause-btn');
-        btn.innerText = core.isLive ? "STOP LIVE" : "RESUME LIVE";
-        btn.classList.toggle('paused-mode', !core.isLive);
-        core.log(core.isLive ? "--- LIVE DATA RESUMED ---" : "--- LIVE DATA STOPPED ---", true);
-    },
-
-    toggleCtrl: (pg) => {
-        document.getElementById('ctrl-p1').classList.toggle('hidden', pg === 2);
-        document.getElementById('ctrl-p2').classList.toggle('hidden', pg === 1);
-    },
-
-    exportLog: () => {
-        const blob = new Blob([core.logStr], { type: 'text/plain' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `GW4D20_DUMP_${Date.now()}.txt`;
-        a.click();
-        core.log("LOG EXPORTED.", true);
-    },
-
-    manualHex: () => {
-        const h = prompt("HEX BYTES (e.g. 22 F4 0C)");
-        if (h) core.sendUDS(h.split(' ').map(x => parseInt(x, 16)));
-    },
-
-    disconnect: () => { core.isRunning = false; location.reload(); }
-};
-
-// Init Canvas Resolution
-document.querySelectorAll('canvas').forEach(c => { c.width = 200; c.height = 200; });
-              </script>
-  
-
-</body>
-</html>
+                <a href="https://ozbargain.com.au" target="_blank" class="action-trigger" onmouseenter="morphCanvas('vehicles')" onclick="lockViewport('vehicles', event)">
+                    <span class="icon-box">🚗</span>
+                    <div class="txt-box">
+                        <span class="txt-main">Vehicles, Fuel & Tools</span>
+                        
