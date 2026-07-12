@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Deal Hub</title>
+    <title>Master Deal Hub - Townsville Radar</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0d0e15">
     <style>
@@ -60,13 +60,12 @@
         }
         @keyframes radarSweep { 0% { transform: scale(0.9); } 100% { transform: scale(1.2); } }
 
-        /* 5. STATE VEHICLES: THE CYBER COCKPIT (HUD Dashboard, Shifter, Windscreen) */
+        /* 5. STATE VEHICLES: THE CYBER COCKPIT */
         .bg-vehicles {
             background: 
                 linear-gradient(180deg, rgba(10,11,16,0.9) 0%, rgba(20,23,36,0.4) 50%, rgba(5,6,9,0.95) 80%),
                 repeating-linear-gradient(0deg, rgba(0,243,255,0.03) 0px, rgba(0,243,255,0.03) 2px, transparent 2px, transparent 4px);
         }
-        /* Steering Wheel & Gear Shifter Vector Overlays */
         .hud-wheel {
             position: absolute; bottom: -100px; left: calc(50% - 150px); width: 300px; height: 300px;
             border: 12px solid rgba(0, 243, 255, 0.15); border-radius: 50%; opacity: 0;
@@ -93,88 +92,29 @@
         .ui-wrapper {
             position: relative; z-index: 10; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-sizing: border-box; padding: 20px;
+            box-sizing: border-box; padding: 20px; overflow-y: auto;
         }
         .app-card {
-            width: 100%; max-width: 440px; background: rgba(13, 15, 24, 0.75);
+            width: 100%; max-width: 440px; background: rgba(13, 15, 24, 0.85);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px;
-            padding: 30px 24px; box-sizing: border-box;
+            padding: 24px; box-sizing: border-box;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
-        h1 { margin: 0 0 5px 0; text-align: center; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: #fff; }
-        .subtitle { text-align: center; color: #8a99ad; font-size: 13px; margin-bottom: 30px; }
         
-        /* MASTER STREAMLINED BUTTONS */
-        .btn-stack { display: flex; flex-direction: column; gap: 14px; }
-        .action-trigger {
-            display: flex; align-items: center; background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px;
-            padding: 16px; text-decoration: none; color: #fff; transition: all 0.3s ease;
-            cursor: pointer; position: relative; overflow: hidden;
+        /* NEW TOWNSVILLE INTEGRATED COMPONENTS */
+        .radar-panel {
+            border: 1px dashed var(--neon-cyan); border-radius: 12px;
+            padding: 12px; margin-bottom: 20px; background: rgba(0, 243, 255, 0.02);
         }
-        .action-trigger:hover, .action-trigger.active {
-            background: rgba(0, 243, 255, 0.08); border-color: var(--neon-cyan);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.15); transform: translateY(-2px);
+        .radar-title { color: var(--neon-cyan); font-size: 12px; font-weight: 800; letter-spacing: 1px; margin: 0 0 8px 0; }
+        .alert-stream { font-size: 13px; color: #8a99ad; }
+        .essential-box {
+            background: rgba(255, 255, 255, 0.02); border-radius: 12px;
+            padding: 12px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05);
         }
-        .icon-box { font-size: 28px; margin-right: 15px; width: 45px; text-align: center; }
-        .txt-box { display: flex; flex-direction: column; }
-        .txt-main { font-weight: 700; font-size: 15px; letter-spacing: 0.2px; }
-        .txt-sub { font-size: 12px; color: #8a99ad; margin-top: 3px; font-weight: 400; }
-
-        /* WINDOW CONTROLS (Back / Reset Overlay) */
-        #window-exit {
-            position: absolute; top: 20px; left: 20px; background: rgba(255,0,85,0.2);
-            border: 1px solid var(--neon-magenta); color: #fff; padding: 10px 18px;
-            border-radius: 30px; font-size: 12px; font-weight: 700; cursor: pointer;
-            opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 100;
-        }
-        #window-exit.visible { opacity: 1; pointer-events: auto; }
-    </style>
-</head>
-<body>
-
-    <!-- THE DYNAMIC VECTOR CANVAS ENVIRONMENT -->
-    <div id="app-canvas" class="bg-dna">
-        <div class="hud-wheel"></div>
-        <div class="hud-shifter"></div>
-    </div>
-
-    <!-- UI LAYER COCKPIT INTERFACE -->
-    <div class="ui-wrapper">
-        <button id="window-exit" onclick="resetDashboard()">❌ Exit Viewport</button>
-
-        <div class="app-card" id="main-panel">
-            <h1>📍 MASTER DEAL HUB</h1>
-            <div class="subtitle">Tap category to morph canvas & scrape live Australian pages</div>
-            
-            <div class="btn-stack">
-                <a href="https://ozbargain.com.au" target="_blank" class="action-trigger" onmouseenter="morphCanvas('food')" onmouseleave="clearMorph()">
-                    <span class="icon-box">🍔</span>
-                    <div class="txt-box">
-                        <span class="txt-main">Food & Takeaways</span>
-                        <span class="txt-sub">Macca's, KFC $1 Drops, Domino's, Independent Butchers</span>
-                    </div>
-                </a>
-
-                <a href="https://ozbargain.com.au" target="_blank" class="action-trigger" onmouseenter="morphCanvas('tech')" onmouseleave="clearMorph()">
-                    <span class="icon-box">💻</span>
-                    <div class="txt-box">
-                        <span class="txt-main">Electronics & Tech</span>
-                        <span class="txt-sub">Amazon Glitches, eBay Vouchers, JB Hi-Fi Commercial Matches</span>
-                    </div>
-                </a>
-
-                <a href="https://ozbargain.com.au" target="_blank" class="action-trigger" onmouseenter="morphCanvas('travel')" onmouseleave="clearMorph()">
-                    <span class="icon-box">✈️</span>
-                    <div class="txt-box">
-                        <span class="txt-main">Holidays & Travel</span>
-                        <span class="txt-sub">Jetstar Flight Drops, Secret Hotel Promos, Free Luggage Loops</span>
-                    </div>
-                </a>
-
-                <a href="https://ozbargain.com.au" target="_blank" class="action-trigger" onmouseenter="morphCanvas('vehicles')" onclick="lockViewport('vehicles', event)">
-                    <span class="icon-box">🚗</span>
-                    <div class="txt-box">
-                        <span class="txt-main">Vehicles, Fuel & Tools</span>
-                        
+        
+        h1 { margin: 0 0 5px 0; text-align: center; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: #fff; }
+        .subtitle { text-align: center; color: #8a99ad; font-size: 12px; margin-bottom: 20px; }
+        .btn-stack { display: flex; flex-direction: column; gap: 12px; }
+        
